@@ -1,0 +1,218 @@
+### **Understanding the Combined Rust Compression & Decompression Script**
+
+#### **High-Level Overview**
+This Rust script combines two core functionalities:
+1. **Compression**: Taking an input file, compressing it using the Gzip algorithm, and writing the compressed content to a target file.
+2. **Decompression**: Reading a previously compressed file (in `.gz` format), decompressing its content, and restoring it to its original state in a target file.
+
+The script uses the **`flate2` crate**, a library for handling Gzip, Deflate, and Zlib compression formats in Rust.
+
+---
+
+#### **How the Script Works: Step-by-Step**
+
+##### **1. Command-Line Argument Parsing**
+At runtime, the program expects the user to provide:
+- **Mode**: Either `compress` or `decompress`.
+- **Source File**: The file to compress or decompress.
+- **Target File**: The output file where results will be stored.
+
+Example:
+```bash
+cargo run -- compress input.txt output.gz
+cargo run -- decompress output.gz restored.txt
+```
+
+- The script checks that the correct number of arguments is passed using:
+  ```rust
+  let args: Vec<String> = args().collect();
+  if args.len() != 4 {
+      eprintln!("Usage: compress|decompress <source> <target>");
+      return;
+  }
+  ```
+
+##### **2. Mode Selection**
+The program reads the **first argument** (mode) and matches it:
+- If the mode is `"compress"`, the script calls the `compress` function.
+- If the mode is `"decompress"`, it calls the `decompress` function.
+- If an invalid mode is provided, it prints an error.
+
+This is done using a `match` statement:
+```rust
+match mode.as_str() {
+    "compress" => { compress(source, target); }
+    "decompress" => { decompress(source, target); }
+    _ => { eprintln!("Invalid mode."); }
+}
+```
+
+---
+
+#### **Compression Logic: High-Level to Low-Level**
+
+1. **Open Source File**:
+   - The source file is opened using `File::open()` and wrapped in a **buffered reader** for efficiency.
+   - A `BufReader` minimizes system calls by reading data in chunks.
+
+   ```rust
+   let input = BufReader::new(File::open(source).expect("Failed to open source file"));
+   ```
+
+2. **Create Target File**:
+   - The target file (compressed output) is created using `File::create`.
+
+   ```rust
+   let output = File::create(target).expect("Failed to create target file");
+   ```
+
+3. **Initialize Gzip Encoder**:
+   - The `GzEncoder` struct (from the `flate2` crate) wraps the target file and compresses any data written to it using the **Gzip algorithm**.
+
+   ```rust
+   let mut encoder = GzEncoder::new(output, Compression::default());
+   ```
+
+4. **Copy Data**:
+   - Data from the source file is copied to the Gzip encoder using the `copy` function. This is efficient and automatically handles reading and writing.
+
+   ```rust
+   copy(&mut input.clone(), &mut encoder).expect("Failed to compress file");
+   ```
+
+5. **Finalize Compression**:
+   - The `encoder.finish()` function ensures all compressed data is flushed and written to the output file.
+
+   ```rust
+   let output = encoder.finish().expect("Failed to finalize compression");
+   ```
+
+6. **Report Results**:
+   - The script measures and displays:
+     - The **original size** of the source file.
+     - The **compressed size** of the output file.
+     - The **time taken** for compression.
+
+   ```rust
+   println!("Compression completed in {:?}", start.elapsed());
+   ```
+
+---
+
+#### **Decompression Logic: High-Level to Low-Level**
+
+1. **Open Compressed Source File**:
+   - The `.gz` file is opened using `File::open()`.
+
+   ```rust
+   let input_file = File::open(source).expect("Failed to open compressed file");
+   ```
+
+2. **Initialize Gzip Decoder**:
+   - The `GzDecoder` wraps the compressed file and decompresses its contents as they are read.
+
+   ```rust
+   let mut decoder = GzDecoder::new(input_file);
+   ```
+
+3. **Create Target File**:
+   - The decompressed data will be written to this target file.
+
+   ```rust
+   let mut output_file = File::create(target).expect("Failed to create target file");
+   ```
+
+4. **Copy Data**:
+   - Data is copied from the Gzip decoder to the target file using the `copy` function.
+
+   ```rust
+   copy(&mut decoder, &mut output_file).expect("Failed to decompress file");
+   ```
+
+5. **Report Results**:
+   - The script measures and reports:
+     - The **size** of the decompressed file.
+     - The **time taken** for decompression.
+
+   ```rust
+   println!("Decompression completed in {:?}", start.elapsed());
+   ```
+
+---
+
+#### **Key Libraries and Concepts Used**
+
+1. **`flate2` Crate**:
+   - Provides Gzip compression (`GzEncoder`) and decompression (`GzDecoder`).
+   - Supports different compression levels (`Compression::default()`).
+
+2. **`std::fs` Module**:
+   - `File::open()` and `File::create()` handle file input/output operations.
+
+3. **`std::io` Module**:
+   - `BufReader` optimizes file reading.
+   - `copy()` is used for efficient data transfer.
+
+4. **Command-Line Argument Handling**:
+   - The `std::env::args` function reads arguments passed to the program.
+
+5. **Time Measurement**:
+   - `std::time::Instant` is used to calculate the duration of compression/decompression.
+
+---
+
+#### **Summary**
+This Rust script:
+1. Accepts user input to determine whether to **compress** or **decompress** a file.
+2. Uses the `flate2` crate for Gzip-based compression and decompression.
+3. Ensures efficient file handling with `BufReader` and `copy`.
+4. Reports relevant details like file sizes and execution time to provide clear feedback.
+
+---
+
+You can copy this explanation directly into your `input.txt` file to test the script:
+
+```plaintext
+Understanding the Combined Rust Compression & Decompression Script
+
+High-Level Overview:
+This Rust script combines two core functionalities:
+1. Compression: Taking an input file, compressing it using the Gzip algorithm, and writing the compressed content to a target file.
+2. Decompression: Reading a previously compressed file (in .gz format), decompressing its content, and restoring it to its original state.
+
+The script uses the `flate2` crate for Gzip compression and decompression.
+
+Core Steps:
+1. Command-line arguments specify the mode, source file, and target file.
+2. For compression:
+   - Read data from the source file.
+   - Compress the data with Gzip and save it to a target file.
+3. For decompression:
+   - Read the compressed file.
+   - Decompress its data and save it to a target file.
+4. The script reports file sizes and execution time for clarity.
+
+Libraries Used:
+- flate2: Provides GzEncoder for compression and GzDecoder for decompression.
+- std::fs: Handles file I/O operations.
+- std::io: Ensures efficient data transfer using BufReader and copy().
+- std::time: Measures execution time.
+
+Usage:
+- Compress: cargo run -- compress input.txt output.gz
+- Decompress: cargo run -- decompress output.gz restored.txt
+```
+
+---
+
+### Steps to Test:
+1. Save this explanation as `input.txt`.
+2. Run the compression command:
+   ```bash
+   cargo run -- compress input.txt compressed.gz
+   ```
+3. Run the decompression command:
+   ```bash
+   cargo run -- decompress compressed.gz output.txt
+   ```
+4. Verify that `output.txt` matches the original `input.txt`.
