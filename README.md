@@ -3,7 +3,6 @@
 ## **Project Description**  
 This is a simple command-line tool written in **Rust** that allows you to compress and decompress files using the **Gzip** format. The tool is designed for efficiency, providing file size reports and execution time for each operation.  
 
----
 
 ## **Features**
 - **File Compression**: Compress any file into Gzip format (`.gz`).
@@ -12,12 +11,10 @@ This is a simple command-line tool written in **Rust** that allows you to compre
    - Displays file sizes before and after compression.  
    - Shows time taken to complete the operation.  
 
----
 
 ## **Requirements**
 - **Rust** installed on your system. (Follow [Rust installation guide](https://www.rust-lang.org/tools/install) if not already installed.)
 
----
 
 ## **How to Clone and Set Up the Project**
 
@@ -37,7 +34,6 @@ This is a simple command-line tool written in **Rust** that allows you to compre
 3. **Run the Executable**:  
    After building, the binary can be found in the `target/release/` directory.
 
----
 
 ## **How to Use**
 
@@ -80,8 +76,6 @@ Decompressed file size: 7143 bytes
 Decompression completed in 534.788µs
 ```
 
----
-
 ## **Testing the Tool**
 
 ### **Included Sample File (`input.txt`)**  
@@ -111,7 +105,6 @@ The repository already includes a sample file named `input.txt` that you can use
 
    If there is no output, the files are identical.
 
----
 
 ## **Error Handling**
 - Ensure the correct number of arguments are provided:
@@ -125,23 +118,19 @@ The repository already includes a sample file named `input.txt` that you can use
 
 - The program will exit gracefully if a file does not exist or permissions are insufficient.
 
----
 
 ## **Dependencies**
 This project uses the following crate:
 - [flate2](https://docs.rs/flate2/latest/flate2/) - Provides Gzip compression and decompression.
 
----
 
 ## **Contribution**  
 Feel free to fork this repository, make improvements, and submit a pull request. Suggestions and issues are welcome!
 
----
 
 ## **License**  
 This project is licensed under the MIT License.  
 
----
 
 ## **Contact**  
 For any questions or feedback, feel free to reach out:  
