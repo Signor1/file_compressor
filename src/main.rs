@@ -55,4 +55,31 @@ fn decompress(source: &str, target: &str) {
     println!("Decompression completed in {:?}", start.elapsed());
 }
 
-fn main() {}
+fn main() {
+    let args: Vec<String> = args().collect();
+
+    if args.len() != 4 {
+        eprintln!(
+            "Usage:\n  Compress:   <mode: compress> <source> <target>\n  Decompress: <mode: decompress> <source> <target>"
+        );
+        return;
+    }
+
+    let mode = &args[1];
+    let source = &args[2];
+    let target = &args[3];
+
+    match mode.as_str() {
+        "compress" => {
+            println!("Compressing {} to {}...", source, target);
+            compress(source, target);
+        }
+        "decompress" => {
+            println!("Decompressing {} to {}...", source, target);
+            decompress(source, target);
+        }
+        _ => {
+            eprintln!("Invalid mode. Use 'compress' or 'decompress'.");
+        }
+    }
+}
